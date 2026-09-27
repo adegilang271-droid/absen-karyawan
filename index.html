@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Attendance System</title>
+    <title>Smart Attendance System - Ade Gilang</title>
     <!-- Menggunakan font modern dari Google Fonts -->
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
@@ -69,7 +69,7 @@
         });
     }
 
-    // 3. Logika Sekali Klik: Jepret Foto Otomatis & Kirim Data
+    // 3. Logika Sekali Klik: Jepret Foto Otomatis & Kirim Data ke Google Sheets
     function kirimAbsenOtomatis() {
         const nama = document.getElementById('karyawanNama').value.trim();
         if (!nama) { 
@@ -81,37 +81,43 @@
             return;
         }
 
-        // Mengambil gambar secara instan dari video streaming (background capture)
+        // Tampilkan animasi loading agar user tahu data sedang dikirim
+        textGps.innerText = "⏳ Sedang Mengirim Absen ke Server...";
+        textGps.style.color = "#e67e22";
+
+        // Mengambil gambar secara instan dari video streaming
         const canvas = document.createElement('canvas');
         canvas.width = webcam.videoWidth;
         canvas.height = webcam.videoHeight;
         canvas.getContext('2d').drawImage(webcam, 0, 0);
-        const dataFotoBase64 = canvas.toDataURL('image/jpeg'); // Mengonversi foto menjadi teks data aman
+        const dataFotoBase64 = canvas.toDataURL('image/jpeg');
 
-        // --- KONFIGURASI URL GOOGLE SHEETS API ---
-        // GANTI TAUTAN DI BAWAH INI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA NANTINYA
-        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbzm_MIgDzlpHaqufAf7h1Y74s7IAkbczFBZYYIuZ2Fu6iw3mjiQeUp7u2Ppeu8Q_GUrrw/exec";
-";
+        // URL API Google Apps Script milik Anda
+        const urlGoogleSheets = "https://google.com";
 
-        if(urlGoogleSheets === "") {
-            // Notifikasi demonstrasi jika belum dihubungkan ke Google Sheets
-            alert(`[DEMO BERSAHIL]\nNama: ${nama}\nGPS: ${lokasiKoordinat}\nFoto Selfie Berhasil Dijepret secara otomatis!\n\n(Hubungkan ke Google Apps Script agar masuk otomatis ke Excel Admin).`);
-            return;
-        }
+        // Paket data dibungkus menjadi teks murni agar bypass keamanan CORS browser HP
+        const payloadData = { nama: nama, gps: lokasiKoordinat, foto: dataFotoBase64 };
 
-        // Proses pengiriman data ke Google Sheets secara real-time
         fetch(urlGoogleSheets, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nama: nama, gps: lokasiKoordinat, foto: dataFotoBase64 })                     })
+            body: JSON.stringify(payloadData),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            redirect: 'follow'
+        })
         .then(() => {
             alert("Sukses! Absen Anda hari ini sudah tercatat di Excel Admin.");
-            document.getElementById('karyawanNama').value = ""; // Mengosongkan kolom input
+            document.getElementById('karyawanNama').value = ""; // Mengosongkan kolom input nama
+            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
+            textGps.style.color = "#27ae60";
         })
-        .catch(err => alert("Gagal mengirim data: " + err));
+        .catch(err => {
+            alert("Terjadi kesalahan jaringan: " + err);
+            textGps.innerText = "❌ Gagal Mengirim Data";
+            textGps.style.color = "#c0392b";
+        });
     }
 </script>
 
 </body>
 </html>
+
