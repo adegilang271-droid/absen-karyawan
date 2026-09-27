@@ -91,8 +91,9 @@
         // --- KONFIGURASI URL GOOGLE SHEETS API ---
         // GANTI TAUTAN DI BAWAH INI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA NANTINYA
         const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbzm_MIgDzlpHaqufAf7h1Y74s7IAkbczFBZYYIuZ2Fu6iw3mjiQeUp7u2Ppeu8Q_GUrrw/exec";
+";
 
-        if(urlGoogleSheets === "https://script.google.com/macros/s/AKfycbzm_MIgDzlpHaqufAf7h1Y74s7IAkbczFBZYYIuZ2Fu6iw3mjiQeUp7u2Ppeu8Q_GUrrw/exec") {
+        if(urlGoogleSheets === "") {
             // Notifikasi demonstrasi jika belum dihubungkan ke Google Sheets
             alert(`[DEMO BERSAHIL]\nNama: ${nama}\nGPS: ${lokasiKoordinat}\nFoto Selfie Berhasil Dijepret secara otomatis!\n\n(Hubungkan ke Google Apps Script agar masuk otomatis ke Excel Admin).`);
             return;
@@ -103,8 +104,7 @@
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nama: nama, gps: lokasiKoordinat, foto: dataFotoBase64 })
-        })
+            body: JSON.stringify({ nama: nama, gps: lokasiKoordinat, foto: dataFotoBase64 })                     })
         .then(() => {
             alert("Sukses! Absen Anda hari ini sudah tercatat di Excel Admin.");
             document.getElementById('karyawanNama').value = ""; // Mengosongkan kolom input
