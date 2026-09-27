@@ -14,13 +14,10 @@
         label { font-size: 12px; font-weight: 600; color: #11998e; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         input[type="text"] { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; box-sizing: border-box; transition: 0.3s; margin-bottom: 5px; }
         input[type="text"]:focus { border-color: #11998e; outline: none; }
-        
-        /* Tombol Radio Masuk/Pulang */
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .radio-label { flex: 1; text-align: center; background: #f2f2f2; padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #e0e0e0; font-weight: 600; color: #555; font-size: 13px; transition: 0.3s; }
         input[type="radio"] { display: none; }
         input[type="radio"]:checked + .radio-label { background: #11998e; color: white; border-color: #11998e; box-shadow: 0 4px 10px rgba(17,153,142,0.2); }
-
         .camera-box { width: 100%; height: 190px; background: #000; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 12px; border: 2px solid #11998e; }
         video { width: 100%; height: 100%; object-fit: cover; }
         .status-gps { font-size: 13px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
@@ -29,54 +26,40 @@
     </style>
 </head>
 <body>
-
 <div class="app-card">
     <div class="logo-title">🏢 ABSENSI ONLINE</div>
     <div class="sub-title">Pastikan Kamera & GPS Handphone Aktif</div>
-    
-    <!-- Input Nama -->
     <div class="input-group">
         <label>Nama Lengkap Karyawan</label>
         <input type="text" id="karyawanNama" placeholder="Ketik nama Anda di sini..." required>
     </div>
-
-    <!-- Pilihan Status Absen -->
     <div class="input-group">
         <label>Pilih Status Absen</label>
         <div class="radio-group">
             <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
             <label for="masuk" class="radio-label">☀️ ABSEN MASUK</label>
-
             <input type="radio" id="pulang" name="status_absen" value="PULANG">
             <label for="pulang" class="radio-label">🌙 ABSEN PULANG</label>
         </div>
     </div>
-
-    <!-- Input Site Work (Ketik Manual) -->
     <div class="input-group">
         <label>Site Work / Lokasi Tugas</label>
         <input type="text" id="siteWorkInput" placeholder="Contoh: Project Bandung, Site A, dll..." required>
     </div>
-
     <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
     <div class="camera-box">
         <video id="webcam" autoplay playsinline></video>
     </div>
-
     <div id="textGps" class="status-gps">📍 Menyelaraskan Lokasi GPS...</div>
-
     <button class="btn-submit" onclick="kirimAbsenOtomatis()">KIRIM DATA ABSENSI</button>
 </div>
-
 <script>
     const webcam = document.getElementById('webcam');
     const textGps = document.getElementById('textGps');
     let lokasiKoordinat = "Belum Terdeteksi";
-
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => { webcam.srcObject = stream; })
         .catch(err => alert("Kamera error / izin ditolak: " + err));
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
             lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
@@ -87,30 +70,25 @@
             textGps.style.color = "#c0392b";
         });
     }
-
     function kirimAbsenOtomatis() {
         const nama = document.getElementById('karyawanNama').value.trim();
         const sitework = document.getElementById('siteWorkInput').value.trim();
         const status = document.querySelector('input[name="status_absen"]:checked').value;
-
         if (!nama) { alert("Silakan masukkan nama Anda!"); return; }
-        if (!sitework) { alert("Silakan isi nama Site Work / Lokasi Tugas Anda!"); return; }
-        if (lokasiKoordinat === "Belum Terdeteksi") { alert("Tunggu sampai GPS berhasil dikunci!"); return; }
-
+        if (!sitework) { alert("Silakan isi nama Site Work!"); return; }
+        if (lokasiKoordinat === "Belum Terdeteksi") { alert("Tunggu sampai GPS dikunci!"); return; }
         textGps.innerText = "⏳ Sedang Mengirim Absen...";
         textGps.style.color = "#e67e22";
-
         const canvas = document.createElement('canvas');
         canvas.width = webcam.videoWidth;
         canvas.height = webcam.videoHeight;
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
-
-        // --- PASTE URL WEB APP BARU YANG ANDA SALIN DARI LANGKAH 2 DI BAWAH INI ---
-        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbzJycq5hD-At_kRpvoC2zeAj_kOguZ9IKsnitNuay8XRpe3beIUTRNdCfwecNXX6uubSA/exec";
-
+        
+        // URL Google Apps Script Versi Penerapan Terbaru Anda
+        const urlGoogleSheets = "https://google.com";
+        
         const payloadData = { nama: nama, status: status, sitework: sitework, gps: lokasiKoordinat, foto: dataFotoBase64 };
-
         fetch(urlGoogleSheets, {
             method: 'POST',
             body: JSON.stringify(payloadData),
@@ -118,7 +96,7 @@
             redirect: 'follow'
         })
         .then(() => {
-            alert(`Sukses! Absen ${status} di ${sitework} telah tercatat di Excel Admin.`);
+            alert(`Sukses! Absen ${status} di ${sitework} telah tercatat.`);
             document.getElementById('karyawanNama').value = ""; 
             document.getElementById('siteWorkInput').value = ""; 
             textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
@@ -131,7 +109,5 @@
         });
     }
 </script>
-
 </body>
 </html>
-
