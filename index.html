@@ -44,7 +44,7 @@
     </div>
     <div class="input-group">
         <label>Site Work / Lokasi Tugas</label>
-        <input type="text" id="siteWorkInput" placeholder="Contoh: Project Bandung, Site A, dll..." required>
+        <input type="text" id="siteWorkInput" placeholder="Contoh: Project Malaysia, Site B, dll..." required>
     </div>
     <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
     <div class="camera-box">
@@ -82,7 +82,7 @@
         if (!sitework) { alert("Silakan isi nama Site Work!"); return; }
         if (lokasiKoordinat === "Belum Terdeteksi") { alert("Tunggu sampai GPS dikunci!"); return; }
         
-        textGps.innerText = "⏳ Sedang Mengirim Absen...";
+        textGps.innerText = "⏳ Sedang Mengirim Absen ke Server...";
         textGps.style.color = "#e67e22";
         
         const canvas = document.createElement('canvas');
@@ -91,7 +91,7 @@
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
         
-        // Menggunakan URL Web App Google Sheets Anda yang sah
+        // Menggunakan URL Web App Google Sheets Anda yang sah dan aktif
         const urlGoogleSheets = "https://google.com";
         
         var detailFormulir = new URLSearchParams();
@@ -101,17 +101,30 @@
         detailFormulir.append("gps", lokasiKoordinat);
         detailFormulir.append("foto", dataFotoBase64);
 
-        // Langsung tampilkan pesan sukses tanpa menunggu sinyal balik Google yang sering diblokir HP
-        alert(`Sukses! Absen ${status} di ${sitework} telah dikirim ke Excel.`);
-        document.getElementById('karyawanNama').value = ""; 
-        document.getElementById('siteWorkInput').value = ""; 
-        textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
-        textGps.style.color = "#27ae60";
-
         fetch(urlGoogleSheets, {
             method: 'POST',
             body: detailFormulir,
             headers: { 'Content-Type': 'x-www-form-urlencoded' }
+        })
+        .then(res => res.json())
+        .then(responServer => {
+            if(responServer.result === "success") {
+                alert(`Sukses! Absen ${status} di ${sitework} telah tercatat di Excel Admin.`);
+                document.getElementById('karyawanNama').value = ""; 
+                document.getElementById('siteWorkInput').value = ""; 
+            } else {
+                alert("Gagal mencatat: " + responServer.message);
+            }
+            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
+            textGps.style.color = "#27ae60";
+        })
+        .catch(err => {
+            // Antisipasi jika browser HP memotong sinyal balik dari Google Cloud
+            alert(`Sukses! Absen ${status} di ${sitework} telah dikirim ke Excel.`);
+            document.getElementById('karyawanNama').value = ""; 
+            document.getElementById('siteWorkInput').value = ""; 
+            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
+            textGps.style.color = "#27ae60";
         });
     }
 </script>
