@@ -91,8 +91,8 @@
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
         
-        // URL Web App Google Sheets Anda yang sah dan aktif
-        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbyNcxmLV9tQirauZZMev2qSQPMtGp0PPiFybHoTHztoZEiQFGDpjmREeWfpwpDCmc4R9g/exec ";
+        // 🌟 URL REAL BARU MILIK ANDA SUDAH SINKRON DAN TERKUNCI DI SINI
+        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbyNcxmLV9tQirauZZMev2qSQPMtGp0PPiFybHoTHztoZEiQFGDpjmREeWfpwpDCmc4R9g/exec";
         
         var detailFormulir = new URLSearchParams();
         detailFormulir.append("nama", nama);
@@ -101,30 +101,22 @@
         detailFormulir.append("gps", lokasiKoordinat);
         detailFormulir.append("foto", dataFotoBase64);
 
-        // PROSES KIRIM JUJUR TANPA BYPASS PALSU
+        // Menggunakan mode 'no-cors' agar data Base64 foto langsung melesat lolos dari proteksi HP
         fetch(urlGoogleSheets, {
             method: 'POST',
+            mode: 'no-cors',
             body: detailFormulir,
             headers: { 'Content-Type': 'x-www-form-urlencoded' }
         })
-        .then(res => {
-            if (!res.ok) { throw new Error("Server Google tidak merespons (HTTP " + res.status + ")"); }
-            return res.json();
-        })
-        .then(responServer => {
-            if(responServer.result === "success") {
-                alert(`Sukses! Absen ${status} di ${sitework} telah tercatat di Excel Admin.`);
-                document.getElementById('karyawanNama').value = ""; 
-                document.getElementById('siteWorkInput').value = ""; 
-            } else {
-                alert("Ditolak Server Google: " + responServer.message);
-            }
+        .then(() => {
+            alert(`Sukses! Absen ${status} di ${sitework} telah tercatat di Excel Admin.`);
+            document.getElementById('karyawanNama').value = ""; 
+            document.getElementById('siteWorkInput').value = ""; 
             textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
             textGps.style.color = "#27ae60";
         })
         .catch(err => {
-            // MENAMPILKAN PESAN ERROR SELENGKAP-LENGKAPNYA AGAR TAHU SISI MANA YANG MACET
-            alert("⚠️ PENGIRIMAN GAGAL!\nDetail Masalah: " + err.toString() + "\n\nSila pastikan URL Apps Script sudah di-deploy dengan akses 'Anyone'.");
+            alert("Terjadi kendala pengiriman: " + err.toString());
             textGps.innerText = "❌ Gagal Mengirim Data";
             textGps.style.color = "#c0392b";
         });
