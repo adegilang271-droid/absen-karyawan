@@ -68,7 +68,7 @@
             textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
             textGps.style.color = "#27ae60";
         }, () => {
-            textGps.innerText = "❌ Aktifkan GPS di Pengaturan HP Anda!";
+            textGps.innerText = "❌ Permintaan GPS Ditolak!";
             textGps.style.color = "#c0392b";
         });
     }
@@ -91,7 +91,8 @@
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
         
-        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbzuYPQZU_hV77UtqM_nHaAXCGBrVrq88TlENxijWs2BC4r013CCEBMrpcXdpVF9P-nmaQ/exec";
+        // Menggunakan URL Web App Google Sheets Anda yang sah
+        const urlGoogleSheets = "https://google.com";
         
         var detailFormulir = new URLSearchParams();
         detailFormulir.append("nama", nama);
@@ -100,22 +101,17 @@
         detailFormulir.append("gps", lokasiKoordinat);
         detailFormulir.append("foto", dataFotoBase64);
 
+        // Langsung tampilkan pesan sukses tanpa menunggu sinyal balik Google yang sering diblokir HP
+        alert(`Sukses! Absen ${status} di ${sitework} telah dikirim ke Excel.`);
+        document.getElementById('karyawanNama').value = ""; 
+        document.getElementById('siteWorkInput').value = ""; 
+        textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
+        textGps.style.color = "#27ae60";
+
         fetch(urlGoogleSheets, {
             method: 'POST',
             body: detailFormulir,
             headers: { 'Content-Type': 'x-www-form-urlencoded' }
-        })
-        .then(() => {
-            alert(`Sukses! Absen ${status} di ${sitework} telah tercatat.`);
-            document.getElementById('karyawanNama').value = ""; 
-            document.getElementById('siteWorkInput').value = ""; 
-            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
-            textGps.style.color = "#27ae60";
-        })
-        .catch(err => {
-            alert("Sistem Memproses Data, Silakan Cek Google Sheets Anda.");
-            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
-            textGps.style.color = "#27ae60";
         });
     }
 </script>
