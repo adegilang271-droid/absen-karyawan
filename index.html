@@ -91,7 +91,7 @@
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
         
-        // Menggunakan URL Web App Google Sheets Anda yang sah dan aktif
+        // URL Web App Google Sheets Anda yang sah dan aktif
         const urlGoogleSheets = "https://google.com";
         
         var detailFormulir = new URLSearchParams();
@@ -101,30 +101,32 @@
         detailFormulir.append("gps", lokasiKoordinat);
         detailFormulir.append("foto", dataFotoBase64);
 
+        // PROSES KIRIM JUJUR TANPA BYPASS PALSU
         fetch(urlGoogleSheets, {
             method: 'POST',
             body: detailFormulir,
             headers: { 'Content-Type': 'x-www-form-urlencoded' }
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) { throw new Error("Server Google tidak merespons (HTTP " + res.status + ")"); }
+            return res.json();
+        })
         .then(responServer => {
             if(responServer.result === "success") {
                 alert(`Sukses! Absen ${status} di ${sitework} telah tercatat di Excel Admin.`);
                 document.getElementById('karyawanNama').value = ""; 
                 document.getElementById('siteWorkInput').value = ""; 
             } else {
-                alert("Gagal mencatat: " + responServer.message);
+                alert("Ditolak Server Google: " + responServer.message);
             }
             textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
             textGps.style.color = "#27ae60";
         })
         .catch(err => {
-            // Antisipasi jika browser HP memotong sinyal balik dari Google Cloud
-            alert(`Sukses! Absen ${status} di ${sitework} telah dikirim ke Excel.`);
-            document.getElementById('karyawanNama').value = ""; 
-            document.getElementById('siteWorkInput').value = ""; 
-            textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
-            textGps.style.color = "#27ae60";
+            // MENAMPILKAN PESAN ERROR SELENGKAP-LENGKAPNYA AGAR TAHU SISI MANA YANG MACET
+            alert("⚠️ PENGIRIMAN GAGAL!\nDetail Masalah: " + err.toString() + "\n\nSila pastikan URL Apps Script sudah di-deploy dengan akses 'Anyone'.");
+            textGps.innerText = "❌ Gagal Mengirim Data";
+            textGps.style.color = "#c0392b";
         });
     }
 </script>
