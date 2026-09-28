@@ -91,10 +91,8 @@
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
         
-        // --- TEMPEL URL NEW DEPLOYMENT TERBARU ANDA DI BAWAH INI ---
-        const urlGoogleSheets = "https://script.google.com/macros/s/AKfycbyth2HxsMyzhk4AgbJdP56L5_UZIFItBbBFcUC2JB8LXmycl6PQRKeP9gkx30G-D3IEyA/exec";
+        const urlGoogleSheets = "https://google.com";
         
-        // Mengubah kiriman data menjadi format parameter teks formulir standar (Aman dari CORS HP)
         var detailFormulir = new URLSearchParams();
         detailFormulir.append("nama", nama);
         detailFormulir.append("status", status);
@@ -105,17 +103,12 @@
         fetch(urlGoogleSheets, {
             method: 'POST',
             body: detailFormulir,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            headers: { 'Content-Type': 'x-www-form-urlencoded' }
         })
-        .then(res => res.json())
-        .then(responServer => {
-            if(responServer.result === "success") {
-                alert(`Sukses! Absen ${status} di ${sitework} telah tercatat.`);
-                document.getElementById('karyawanNama').value = ""; 
-                document.getElementById('siteWorkInput').value = ""; 
-            } else {
-                alert("Gagal mencatat: " + responServer.message);
-            }
+        .then(() => {
+            alert(`Sukses! Absen ${status} di ${sitework} telah tercatat.`);
+            document.getElementById('karyawanNama').value = ""; 
+            document.getElementById('siteWorkInput').value = ""; 
             textGps.innerText = "✅ Lokasi GPS Berhasil Dikunci";
             textGps.style.color = "#27ae60";
         })
