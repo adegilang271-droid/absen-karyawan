@@ -30,7 +30,6 @@
 <body>
 
 <div class="app-card">
-    <!-- SCREEN 1: PORTAL LOGIN -->
     <div id="loginPortal">
         <div class="logo-title">🔒 STAFF PORTAL</div>
         <div class="sub-title">Please log in with your credentials</div>
@@ -45,7 +44,6 @@
         <button class="btn-primary" onclick="prosesVerification()">VERIFY ACCOUNT</button>
     </div>
 
-    <!-- SCREEN 2: MAIN ATTENDANCE DASHBOARD -->
     <div id="mainDashboard">
         <div class="logo-title">🏢 SMART ABSENSI</div>
         <div id="welcomeUser" class="sub-title" style="margin-bottom: 10px; font-weight: 600; color: #2a5298;">Welcome!</div>
@@ -88,8 +86,7 @@
         throw new Error("Laptop access blocked.");
     }
 
-    // 🌟 URL WEB APP PALING UPDATE MILIK ANDA TELAH AKTIF DI SINI:
-    const urlEngine = "https://script.google.com/macros/s/AKfycbwgF0bsBFlKZOGnSrZbuYb52dTFgT5g81cS2cpWL2JbIu-jz5O_y-WXbC5597ajFCyiUg/exec";
+    const urlEngine = "https://google.com";
     let usernameTerverifikasi = "";
     let lokasiKoordinat = "Belum Terdeteksi";
     const webcam = document.getElementById('webcam');
@@ -182,7 +179,8 @@
     function submitAttendanceData() {
         const selectSite = document.getElementById('siteDropdown').value;
         let siteFinal = selectSite === "MANUAL_INPUT" ? document.getElementById('manualSiteInput').value.trim() : selectSite;
-const status = document.querySelector('input[name="status_absen"]:checked').value;
+        const status = document.querySelector('input[name="status_absen"]:checked').value;
+
 if (!siteFinal) { alert("Please select or type your work location!"); return; }
 if (lokasiKoordinat === "Belum Terdeteksi") { alert("Waiting for GPS lock..."); return; }
 textGps.innerText = "⏳ Uploading to cloud storage...";
