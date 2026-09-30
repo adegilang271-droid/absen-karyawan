@@ -10,27 +10,19 @@
         .app-card { background: #ffffff; padding: 25px 20px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; }
         .logo-title { font-size: 22px; font-weight: 600; color: #1e3c72; margin-bottom: 5px; }
         .sub-title { font-size: 12px; color: #666; margin-bottom: 20px; }
-        
-        /* Info Board Announcement Style */
         .info-box { background: #fff8db; border-left: 5px solid #f1c40f; padding: 12px; border-radius: 8px; text-align: left; font-size: 13px; color: #7f8c8d; margin-bottom: 20px; font-weight: 500; display: none; }
-        
         .input-group { margin-bottom: 15px; text-align: left; }
         label { font-size: 11px; font-weight: 600; color: #1e3c72; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         input[type="text"], input[type="password"], select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; box-sizing: border-box; transition: 0.3s; background: #fff; }
         input[type="text"]:focus, input[type="password"]:focus, select:focus { border-color: #1e3c72; outline: none; }
-        
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .radio-label { flex: 1; text-align: center; background: #f2f2f2; padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #e0e0e0; font-weight: 600; color: #555; font-size: 12px; transition: 0.3s; }
         input[type="radio"] { display: none; }
         input[type="radio"]:checked + .radio-label { background: #1e3c72; color: white; border-color: #1e3c72; }
-
         .camera-box { width: 100%; height: 180px; background: #000; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 12px; border: 2px solid #1e3c72; }
         video { width: 100%; height: 100%; object-fit: cover; }
         .status-gps { font-size: 12px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
-        
         .btn-primary { background: linear-gradient(to right, #1e3c72, #2a5298); color: white; border: none; padding: 15px; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(30,60,114,0.3); transition: 0.3s; }
-        .btn-primary:active { transform: scale(0.98); }
-        
         #mainDashboard { display: none; }
         #manualSiteGroup { display: none; margin-top: 10px; }
     </style>
@@ -38,7 +30,7 @@
 <body>
 
 <div class="app-card">
-    <!-- SCREEN 1: LOGIN PORTAL -->
+    <!-- SCREEN 1: PORTAL LOGIN -->
     <div id="loginPortal">
         <div class="logo-title">🔒 STAFF PORTAL</div>
         <div class="sub-title">Please log in with your credentials</div>
@@ -57,15 +49,12 @@
     <div id="mainDashboard">
         <div class="logo-title">🏢 SMART ABSENSI</div>
         <div id="welcomeUser" class="sub-title" style="margin-bottom: 10px; font-weight: 600; color: #2a5298;">Welcome!</div>
-        
-        <!-- Papan Pengumuman Digital Admin -->
         <div id="announcementBoard" class="info-box"></div>
         
         <div class="input-group">
             <label>Select Work Location</label>
             <select id="siteDropdown" onchange="handleSiteSelection()">
                 <option value="">-- Choose Active Site --</option>
-                <!-- Opsi Ketik Manual Opsional untuk Pekerja Luar -->
                 <option value="MANUAL_INPUT">Other (Type Manually...)</option>
             </select>
             <div id="manualSiteGroup">
@@ -78,7 +67,6 @@
             <div class="radio-group">
                 <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
                 <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
-
                 <input type="radio" id="pulang" name="status_absen" value="PULANG">
                 <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
             </div>
@@ -95,27 +83,23 @@
 </div>
 
 <script>
-    // SECURITY UPGRADE: BLOKIR TOTAL AKSES JIKA DIBUKA DI LAPTOP/PC
     if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         document.body.innerHTML = '<div class="app-card" style="max-width: 500px;"><h2 style="color:#c0392b;">❌ ACCESS DENIED</h2><p style="font-size:14px;color:#555;">Security Restriction: This attendance system can only be accessed using a Mobile Phone device.</p></div>';
         throw new Error("Laptop access blocked.");
     }
 
-    // 🌟 URL REAL BARU DENGAN ZONA WAKTU MALAYSIA MILIK ANDA SUDAH TERTANAM:
-    const urlEngine = "https://script.google.com/macros/s/AKfycbz6Z6wBD-YrbCtOmv4lel6d42nghLeb5DCknfHnmIBxRprPn9qAC3KvQsHhjLYZykI7aA/exec";
-    
+    // 🌟 URL WEB APP PALING UPDATE MILIK ANDA TELAH AKTIF DI SINI:
+    const urlEngine = "https://script.google.com/macros/s/AKfycbwgF0bsBFlKZOGnSrZbuYb52dTFgT5g81cS2cpWL2JbIu-jz5O_y-WXbC5597ajFCyiUg/exec";
     let usernameTerverifikasi = "";
     let lokasiKoordinat = "Belum Terdeteksi";
     const webcam = document.getElementById('webcam');
     const textGps = document.getElementById('textGps');
 
-    // FITUR VOICE GUIDE: Text-to-Speech English Framework
     function speakEnglish(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             let speech = new SpeechSynthesisUtterance(text);
             speech.lang = 'en-US';
-            speech.rate = 1.0;
             window.speechSynthesis.speak(speech);
         }
     }
@@ -123,7 +107,6 @@
     function prosesVerification() {
         const nama = document.getElementById('loginNama').value.trim();
         const pin = document.getElementById('loginPin').value.trim();
-
         if (!nama || !pin) { alert("Please fill in both Name and PIN!"); return; }
 
         speakEnglish("Verifying your account, please wait.");
@@ -137,30 +120,27 @@
         .then(res => res.json())
         .then(response => {
             if (response.result === "success") {
-                usernameTerverifikasi = nama;
+                usernameTerverifikasi = response.namaResmi;
                 document.getElementById('loginPortal').style.display = 'none';
                 document.getElementById('mainDashboard').style.display = 'block';
-                document.getElementById('welcomeUser').innerText = `Logged in as: ${nama.toUpperCase()}`;
+                document.getElementById('welcomeUser').innerText = `Logged in as: ${response.namaResmi.toUpperCase()}`;
                 
-                // Set isi papan pengumuman jika ada data di Excel
                 if (response.announcement && response.announcement.trim() !== "") {
                     const board = document.getElementById('announcementBoard');
                     board.innerText = response.announcement;
                     board.style.display = 'block';
                 }
 
-                // Isi opsi dropdown site secara dinamis dari database Excel
                 const dropdown = document.getElementById('siteDropdown');
                 response.sites.forEach(site => {
                     let opt = document.createElement('option');
                     opt.value = site;
                     opt.innerHTML = site;
-                    // Menyisipkan tepat di atas pilihan manual input pekerja luar
                     dropdown.insertBefore(opt, dropdown.lastElementChild);
                 });
 
                 initiateHardwareDevices();
-                speakEnglish("Login successful. Welcome back, " + nama);
+                speakEnglish("Login successful. Welcome back, " + response.namaResmi);
             } else {
                 alert(response.message);
                 speakEnglish(response.message);
@@ -174,7 +154,7 @@
         const group = document.getElementById('manualSiteGroup');
         if (select === "MANUAL_INPUT") {
             group.style.display = 'block';
-            speakEnglish("Please type your specific work location.");
+            speakEnglish("Please type your location.");
         } else {
             group.style.display = 'none';
         }
@@ -188,26 +168,24 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-textGps.innerText = "✅ GPS Location Locked Successfully";
-textGps.style.color = "#27ae60";
-speakEnglish("G.P.S locked.");
-}, () => {
-textGps.innerText = "❌ Please enable GPS in device settings!";
-textGps.style.color = "#c0392b";
-speakEnglish("Please turn on your location.");
-});
-}
-}
-function submitAttendanceData() {
-const selectSite = document.getElementById('siteDropdown').value;
-let siteFinal = selectSite;
-if (selectSite === "MANUAL_INPUT") {
-siteFinal = document.getElementById('manualSiteInput').value.trim();
-}
+                textGps.innerText = "✅ GPS Location Locked Successfully";
+                textGps.style.color = "#27ae60";
+                speakEnglish("G.P.S locked.");
+            }, () => {
+                textGps.innerText = "❌ Please enable GPS!";
+                textGps.style.color = "#c0392b";
+                speakEnglish("Please turn on your location.");
+            });
+        }
+    }
+
+    function submitAttendanceData() {
+        const selectSite = document.getElementById('siteDropdown').value;
+        let siteFinal = selectSite === "MANUAL_INPUT" ? document.getElementById('manualSiteInput').value.trim() : selectSite;
 const status = document.querySelector('input[name="status_absen"]:checked').value;
 if (!siteFinal) { alert("Please select or type your work location!"); return; }
 if (lokasiKoordinat === "Belum Terdeteksi") { alert("Waiting for GPS lock..."); return; }
-textGps.innerText = "⏳ Uploading parameters to cloud storage...";
+textGps.innerText = "⏳ Uploading to cloud storage...";
 textGps.style.color = "#e67e22";
 speakEnglish("Uploading attendance data.");
 const canvas = document.createElement('canvas');
@@ -222,18 +200,10 @@ param.append("status", status);
 param.append("sitework", siteFinal);
 param.append("gps", lokasiKoordinat);
 param.append("foto", dataFotoBase64);
-// Kirim menggunakan metode form URL-encoded dan mode 'no-cors' agar lolos blokir HP
-fetch(urlEngine, {
-method: 'POST',
-mode: 'no-cors',
-body: param,
-headers: { 'Content-Type': 'x-www-form-urlencoded' }
-})
+fetch(urlEngine, { method: 'POST', mode: 'no-cors', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
 .then(() => {
-let msg = Clock ${status.toLowerCase()} successful. Have a good day.;
 alert(Attendance submitted successfully for site: ${siteFinal});
-speakEnglish(msg);
-// Otomatis reload kembali ke menu portal PIN demi keamanan data baris
+speakEnglish(Clock ${status.toLowerCase()} successful. Have a good day.);
 setTimeout(() => { location.reload(); }, 1500);
 })
 .catch(err => {
@@ -241,3 +211,6 @@ alert("Network packet error: " + err);
 speakEnglish("Transmission error.");
 });
 }
+
+
+
