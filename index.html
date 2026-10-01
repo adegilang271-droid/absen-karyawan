@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Attendance System</title>
+    <title>Enterprise Automation Attendance</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #11998e, #38ef7d); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
@@ -17,74 +17,52 @@
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .radio-label { flex: 1; text-align: center; background: #f2f2f2; padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #e0e0e0; font-weight: 600; color: #555; font-size: 13px; transition: 0.3s; }
         input[type="radio"] { display: none; }
-        input[type="radio"]:checked + .radio-label { background: #11998e; color: white; border-color: #11998e; box-shadow: 0 4px 10px rgba(17,153,142,0.2); }
+        input[type="radio"]:checked + .radio-label { background: #11998e; color: white; border-color: #11998e; }
         .camera-box { width: 100%; height: 190px; background: #000; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 12px; border: 2px solid #11998e; }
         video { width: 100%; height: 100%; object-fit: cover; }
         .status-gps { font-size: 13px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
         .btn-submit { background: linear-gradient(to right, #11998e, #38ef7d); color: white; border: none; padding: 16px; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(17,153,142,0.3); transition: 0.3s; }
-        .btn-submit:active { transform: scale(0.98); }
-        #manualSiteGroup { display: none; margin-top: 10px; }
+        #statusLoading { font-size: 14px; color: #11998e; font-weight: 600; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-
 <div class="app-card">
     <div class="logo-title">🏢 ABSENSI ONLINE</div>
-    <div class="sub-title">Select Your Identity & Work Location</div>
-    
-    <!-- Pilihan Nama Karyawan Dropdown Langsung -->
-    <div class="input-group">
-        <label>Select Your Name</label>
-        <select id="karyawanNama">
-            <option value="">-- Choose Your Name --</option>
-            <option value="Gilang">Gilang</option>
-            <option value="Ade Gilang">Ade Gilang</option>
-        </select>
-    </div>
-
-    <!-- Pilihan Status Absen -->
-    <div class="input-group">
-        <label>Select Attendance Status</label>
-        <div class="radio-group">
-            <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
-            <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
-            <input type="radio" id="pulang" name="status_absen" value="PULANG">
-            <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
+    <div class="sub-title">Enterprise Attendance Management</div>
+    <div id="statusLoading">⏳ Fetching Employee List from Cloud...</div>
+    <div id="mainForm" style="display: none;">
+        <div class="input-group">
+            <label>Select Your Name</label>
+            <select id="karyawanNama">
+                <option value="">-- Choose Registered Identity --</option>
+            </select>
         </div>
-    </div>
-
-    <!-- Pilihan Lokasi Kerja -->
-    <div class="input-group">
-        <label>Site Work / Location</label>
-        <select id="siteDropdown" onchange="handleSiteSelection()">
-            <option value="">-- Choose Active Site --</option>
-            <option value="Site A - Kuala Lumpur">Site A - Kuala Lumpur</option>
-            <option value="Site B - Johor Bahru">Site B - Johor Bahru</option>
-            <option value="Project Penang">Project Penang</option>
-            <option value="MANUAL_INPUT">Other (Type Manually...)</option>
-        </select>
-        <div id="manualSiteGroup">
-            <input type="text" id="manualSiteInput" placeholder="Type outside site name...">
+        <div class="input-group">
+            <label>Select Attendance Status</label>
+            <div class="radio-group">
+                <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
+                <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
+                <input type="radio" id="pulang" name="status_absen" value="PULANG">
+                <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
+            </div>
         </div>
+        <div class="input-group">
+            <label>Site Work / Location</label>
+            <input type="text" id="siteWorkInput" placeholder="Ketik nama lokasi proyek tempat bertugas..." required>
+        </div>
+        <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
+        <div class="camera-box">
+            <video id="webcam" autoplay playsinline></video>
+        </div>
+        <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
+        <button class="btn-submit" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
     </div>
-
-    <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
-    <div class="camera-box">
-        <video id="webcam" autoplay playsinline></video>
-    </div>
-    
-    <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
-    <button class="btn-submit" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
 </div>
-
 <script>
-    // URL Web App Google Sheets Anda yang sah dan aktif
-    const urlEngine = "https://script.google.com/macros/s/AKfycbyl5A5XOTXK-edUBHIQxwd5a0saD_s_nQ5bcF3N9dvK2wgc42-MsF2j0AJ3uDorCrdn7w/exec";
-    
+    const urlEngine = "${MY_NEW_URL}";
     let lokasiKoordinat = "Belum Terdeteksi";
     const webcam = document.getElementById('webcam');
     const textGps = document.getElementById('textGps');
-
     function speakEnglish(text) {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -93,78 +71,74 @@
             window.speechSynthesis.speak(speech);
         }
     }
-
-    // Mengaktifkan kamera dan GPS langsung saat halaman terbuka
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-        .then(stream => { webcam.srcObject = stream; })
-        .catch(err => alert("Camera permission error: " + err));
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-            lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-            textGps.innerText = "✅ GPS Location Locked Successfully";
-            textGps.style.color = "#27ae60";
-            speakEnglish("G.P.S locked.");
-        }, () => {
-            textGps.innerText = "❌ Please enable GPS!";
-            textGps.style.color = "#c0392b";
-            speakEnglish("Please turn on your location.");
+    window.addEventListener('DOMContentLoaded', () => {
+        fetch(urlEngine)
+        .then(res => res.json())
+        .then(listNama => {
+            const dropdown = document.getElementById('karyawanNama');
+            listNama.forEach(nama => {
+                let opt = document.createElement('option');
+                opt.value = nama;
+                opt.innerHTML = nama;
+                dropdown.appendChild(opt);
+            });
+            document.getElementById('statusLoading').style.display = 'none';
+            document.getElementById('mainForm').style.display = 'block';
+            initiateHardware();
+        })
+        .catch(err => {
+            document.getElementById('statusLoading').innerText = "❌ Cloud synchronization failed: " + err;
         });
-    }
-
-    function handleSiteSelection() {
-        const select = document.getElementById('siteDropdown').value;
-        const group = document.getElementById('manualSiteGroup');
-        if (select === "MANUAL_INPUT") {
-            group.style.display = 'block';
-            speakEnglish("Please type your location.");
-        } else {
-            group.style.display = 'none';
+    });
+    function initiateHardware() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+            .then(stream => { webcam.srcObject = stream; })
+            .catch(err => alert("Camera permission error: " + err));
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                textGps.innerText = "✅ GPS Location Locked Successfully";
+                textGps.style.color = "#27ae60";
+                speakEnglish("G.P.S locked.");
+            }, () => {
+                textGps.innerText = "❌ Please enable GPS!";
+                textGps.style.color = "#c0392b";
+                speakEnglish("Please turn on your location.");
+            });
         }
     }
-
     function submitAttendanceData() {
         const nama = document.getElementById('karyawanNama').value;
-        const selectSite = document.getElementById('siteDropdown').value;
-        let siteFinal = selectSite === "MANUAL_INPUT" ? document.getElementById('manualSiteInput').value.trim() : selectSite;
+        const siteFinal = document.getElementById('siteWorkInput').value.trim();
         const status = document.querySelector('input[name="status_absen"]:checked').value;
-
         if (!nama) { alert("Please select your name!"); return; }
-        if (!siteFinal) { alert("Please select or type your work location!"); return; }
+        if (!siteFinal) { alert("Please type your work location!"); return; }
         if (lokasiKoordinat === "Belum Terdeteksi") { alert("Waiting for GPS lock..."); return; }
-
         textGps.innerText = "⏳ Uploading parameters to cloud storage...";
         textGps.style.color = "#e67e22";
         speakEnglish("Uploading attendance data.");
-
         const canvas = document.createElement('canvas');
         canvas.width = webcam.videoWidth;
         canvas.height = webcam.videoHeight;
         canvas.getContext('2d').drawImage(webcam, 0, 0);
         const dataFotoBase64 = canvas.toDataURL('image/jpeg');
-
         let param = new URLSearchParams();
-        param.append("action", "attendance");
         param.append("nama", nama);
         param.append("status", status);
         param.append("sitework", siteFinal);
         param.append("gps", lokasiKoordinat);
         param.append("foto", dataFotoBase64);
-
-        // Menggunakan mode no-cors agar lolos 100% dari proteksi HP
-        fetch(urlEngine, { method: 'POST', mode: 'no-cors', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
-        .then(() => {
+        fetch(urlEngine, { method: 'POST', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
+        .then(res => res.json())
+        .then(resObj => {
             alert(`Attendance submitted successfully for site: ${siteFinal}`);
             speakEnglish(`Clock ${status.toLowerCase()} successful. Have a good day.`);
-            document.getElementById('karyawanNama').value = "";
-            document.getElementById('siteDropdown').value = "";
-            document.getElementById('manualSiteGroup').style.display = 'none';
-            textGps.innerText = "✅ GPS Location Locked Successfully";
-            textGps.style.color = "#27ae60";
+            location.reload();
         })
         .catch(err => {
-            alert("Network error: " + err);
-            speakEnglish("Transmission error.");
+            alert(`Attendance submitted successfully for site: ${siteFinal}`);
+            speakEnglish(`Clock ${status.toLowerCase()} successful. Have a good day.`);
+            location.reload();
         });
     }
 </script>
