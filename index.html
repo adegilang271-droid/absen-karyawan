@@ -3,91 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Attendance System</title>
+    <title>Smart Attendance System</title>
     <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
-        .app-card { background: #ffffff; padding: 25px 20px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; }
-        .logo-title { font-size: 22px; font-weight: 600; color: #1e3c72; margin-bottom: 5px; }
-        .sub-title { font-size: 12px; color: #666; margin-bottom: 20px; }
-        .info-box { background: #fff8db; border-left: 5px solid #f1c40f; padding: 12px; border-radius: 8px; text-align: left; font-size: 13px; color: #7f8c8d; margin-bottom: 20px; font-weight: 500; display: none; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #11998e, #38ef7d); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
+        .app-card { background: #ffffff; padding: 30px 20px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; }
+        .logo-title { font-size: 24px; font-weight: 600; color: #11998e; margin-bottom: 5px; }
+        .sub-title { font-size: 13px; color: #666; margin-bottom: 20px; }
         .input-group { margin-bottom: 15px; text-align: left; }
-        label { font-size: 11px; font-weight: 600; color: #1e3c72; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="text"], input[type="password"], select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; box-sizing: border-box; transition: 0.3s; background: #fff; }
-        input[type="text"]:focus, input[type="password"]:focus, select:focus { border-color: #1e3c72; outline: none; }
+        label { font-size: 12px; font-weight: 600; color: #11998e; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="text"], select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; box-sizing: border-box; transition: 0.3s; background: #fff; margin-bottom: 5px; }
+        input[type="text"]:focus, select:focus { border-color: #11998e; outline: none; }
         .radio-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .radio-label { flex: 1; text-align: center; background: #f2f2f2; padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #e0e0e0; font-weight: 600; color: #555; font-size: 12px; transition: 0.3s; }
+        .radio-label { flex: 1; text-align: center; background: #f2f2f2; padding: 12px; border-radius: 12px; cursor: pointer; border: 2px solid #e0e0e0; font-weight: 600; color: #555; font-size: 13px; transition: 0.3s; }
         input[type="radio"] { display: none; }
-        input[type="radio"]:checked + .radio-label { background: #1e3c72; color: white; border-color: #1e3c72; }
-        .camera-box { width: 100%; height: 180px; background: #000; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 12px; border: 2px solid #1e3c72; }
+        input[type="radio"]:checked + .radio-label { background: #11998e; color: white; border-color: #11998e; box-shadow: 0 4px 10px rgba(17,153,142,0.2); }
+        .camera-box { width: 100%; height: 190px; background: #000; border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 12px; border: 2px solid #11998e; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .status-gps { font-size: 12px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
-        .btn-primary { background: linear-gradient(to right, #1e3c72, #2a5298); color: white; border: none; padding: 15px; font-size: 15px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(30,60,114,0.3); transition: 0.3s; }
-        #mainDashboard { display: none; }
+        .status-gps { font-size: 13px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
+        .btn-submit { background: linear-gradient(to right, #11998e, #38ef7d); color: white; border: none; padding: 16px; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(17,153,142,0.3); transition: 0.3s; }
+        .btn-submit:active { transform: scale(0.98); }
         #manualSiteGroup { display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="app-card">
-    <div id="loginPortal">
-        <div class="logo-title">🔒 STAFF PORTAL</div>
-        <div class="sub-title">Please log in with your credentials</div>
-        <div class="input-group">
-            <label>Employee Name</label>
-            <input type="text" id="loginNama" placeholder="Enter your registered name...">
-        </div>
-        <div class="input-group">
-            <label>6-Digit PIN</label>
-            <input type="password" id="loginPin" maxlength="6" placeholder="Enter your security PIN...">
-        </div>
-        <button class="btn-primary" onclick="prosesVerification()">VERIFY ACCOUNT</button>
+    <div class="logo-title">🏢 ABSENSI ONLINE</div>
+    <div class="sub-title">Select Your Identity & Work Location</div>
+    
+    <!-- Pilihan Nama Karyawan Dropdown Langsung -->
+    <div class="input-group">
+        <label>Select Your Name</label>
+        <select id="karyawanNama">
+            <option value="">-- Choose Your Name --</option>
+            <option value="Gilang">Gilang</option>
+            <option value="Ade Gilang">Ade Gilang</option>
+        </select>
     </div>
 
-    <div id="mainDashboard">
-        <div class="logo-title">🏢 SMART ABSENSI</div>
-        <div id="welcomeUser" class="sub-title" style="margin-bottom: 10px; font-weight: 600; color: #2a5298;">Welcome!</div>
-        <div id="announcementBoard" class="info-box"></div>
-        
-        <div class="input-group">
-            <label>Select Work Location</label>
-            <select id="siteDropdown" onchange="handleSiteSelection()">
-                <option value="">-- Choose Active Site --</option>
-                <option value="MANUAL_INPUT">Other (Type Manually...)</option>
-            </select>
-            <div id="manualSiteGroup">
-                <input type="text" id="manualSiteInput" placeholder="Type outside location / site name...">
-            </div>
+    <!-- Pilihan Status Absen -->
+    <div class="input-group">
+        <label>Select Attendance Status</label>
+        <div class="radio-group">
+            <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
+            <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
+            <input type="radio" id="pulang" name="status_absen" value="PULANG">
+            <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
         </div>
-
-        <div class="input-group">
-            <label>Select Attendance Status</label>
-            <div class="radio-group">
-                <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
-                <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
-                <input type="radio" id="pulang" name="status_absen" value="PULANG">
-                <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
-            </div>
-        </div>
-
-        <label style="text-align: left; display: block;">Live Camera Preview</label>
-        <div class="camera-box">
-            <video id="webcam" autoplay playsinline></video>
-        </div>
-
-        <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
-        <button class="btn-primary" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
     </div>
+
+    <!-- Pilihan Lokasi Kerja -->
+    <div class="input-group">
+        <label>Site Work / Location</label>
+        <select id="siteDropdown" onchange="handleSiteSelection()">
+            <option value="">-- Choose Active Site --</option>
+            <option value="Site A - Kuala Lumpur">Site A - Kuala Lumpur</option>
+            <option value="Site B - Johor Bahru">Site B - Johor Bahru</option>
+            <option value="Project Penang">Project Penang</option>
+            <option value="MANUAL_INPUT">Other (Type Manually...)</option>
+        </select>
+        <div id="manualSiteGroup">
+            <input type="text" id="manualSiteInput" placeholder="Type outside site name...">
+        </div>
+    </div>
+
+    <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
+    <div class="camera-box">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+    
+    <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
+    <button class="btn-submit" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
 </div>
 
 <script>
-    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        document.body.innerHTML = '<div class="app-card" style="max-width: 500px;"><h2 style="color:#c0392b;">❌ ACCESS DENIED</h2><p style="font-size:14px;color:#555;">Security Restriction: This attendance system can only be accessed using a Mobile Phone device.</p></div>';
-        throw new Error("Laptop access blocked.");
-    }
-
-    const urlEngine = "https://script.google.com/macros/s/AKfycbwgF0bsBFlKZOGnSrZbuYb52dTFgT5g81cS2cpWL2JbIu-jz5O_y-WXbC5597ajFCyiUg/exec";
-    let usernameTerverifikasi = "";
+    // URL Web App Google Sheets Anda yang sah dan aktif
+    const urlEngine = "https://script.google.com/macros/s/AKfycbyl5A5XOTXK-edUBHIQxwd5a0saD_s_nQ5bcF3N9dvK2wgc42-MsF2j0AJ3uDorCrdn7w/exec";
+    
     let lokasiKoordinat = "Belum Terdeteksi";
     const webcam = document.getElementById('webcam');
     const textGps = document.getElementById('textGps');
@@ -101,49 +94,22 @@
         }
     }
 
-    function prosesVerification() {
-        const nama = document.getElementById('loginNama').value.trim();
-        const pin = document.getElementById('loginPin').value.trim();
-        if (!nama || !pin) { alert("Please fill in both Name and PIN!"); return; }
+    // Mengaktifkan kamera dan GPS langsung saat halaman terbuka
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => { webcam.srcObject = stream; })
+        .catch(err => alert("Camera permission error: " + err));
 
-        speakEnglish("Verifying your account, please wait.");
-        
-        let param = new URLSearchParams();
-        param.append("action", "login");
-        param.append("nama", nama);
-        param.append("pin", pin);
-
-        fetch(urlEngine, { method: 'POST', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
-        .then(res => res.json())
-        .then(response => {
-            if (response.result === "success") {
-                usernameTerverifikasi = response.namaResmi;
-                document.getElementById('loginPortal').style.display = 'none';
-                document.getElementById('mainDashboard').style.display = 'block';
-                document.getElementById('welcomeUser').innerText = `Logged in as: ${response.namaResmi.toUpperCase()}`;
-                
-                if (response.announcement && response.announcement.trim() !== "") {
-                    const board = document.getElementById('announcementBoard');
-                    board.innerText = response.announcement;
-                    board.style.display = 'block';
-                }
-
-                const dropdown = document.getElementById('siteDropdown');
-                response.sites.forEach(site => {
-                    let opt = document.createElement('option');
-                    opt.value = site;
-                    opt.innerHTML = site;
-                    dropdown.insertBefore(opt, dropdown.lastElementChild);
-                });
-
-                initiateHardwareDevices();
-                speakEnglish("Login successful. Welcome back, " + response.namaResmi);
-            } else {
-                alert(response.message);
-                speakEnglish(response.message);
-            }
-        })
-        .catch(err => alert("Verification connection error: " + err));
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+            textGps.innerText = "✅ GPS Location Locked Successfully";
+            textGps.style.color = "#27ae60";
+            speakEnglish("G.P.S locked.");
+        }, () => {
+            textGps.innerText = "❌ Please enable GPS!";
+            textGps.style.color = "#c0392b";
+            speakEnglish("Please turn on your location.");
+        });
     }
 
     function handleSiteSelection() {
@@ -157,58 +123,50 @@
         }
     }
 
-    function initiateHardwareDevices() {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(stream => { webcam.srcObject = stream; })
-            .catch(err => alert("Camera permission error: " + err));
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-                textGps.innerText = "✅ GPS Location Locked Successfully";
-                textGps.style.color = "#27ae60";
-                speakEnglish("G.P.S locked.");
-            }, () => {
-                textGps.innerText = "❌ Please enable GPS!";
-                textGps.style.color = "#c0392b";
-                speakEnglish("Please turn on your location.");
-            });
-        }
-    }
-
     function submitAttendanceData() {
+        const nama = document.getElementById('karyawanNama').value;
         const selectSite = document.getElementById('siteDropdown').value;
         let siteFinal = selectSite === "MANUAL_INPUT" ? document.getElementById('manualSiteInput').value.trim() : selectSite;
         const status = document.querySelector('input[name="status_absen"]:checked').value;
 
-if (!siteFinal) { alert("Please select or type your work location!"); return; }
-if (lokasiKoordinat === "Belum Terdeteksi") { alert("Waiting for GPS lock..."); return; }
-textGps.innerText = "⏳ Uploading to cloud storage...";
-textGps.style.color = "#e67e22";
-speakEnglish("Uploading attendance data.");
-const canvas = document.createElement('canvas');
-canvas.width = webcam.videoWidth;
-canvas.height = webcam.videoHeight;
-canvas.getContext('2d').drawImage(webcam, 0, 0);
-const dataFotoBase64 = canvas.toDataURL('image/jpeg');
-let param = new URLSearchParams();
-param.append("action", "attendance");
-param.append("nama", usernameTerverifikasi);
-param.append("status", status);
-param.append("sitework", siteFinal);
-param.append("gps", lokasiKoordinat);
-param.append("foto", dataFotoBase64);
-fetch(urlEngine, { method: 'POST', mode: 'no-cors', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
-.then(() => {
-alert(Attendance submitted successfully for site: ${siteFinal});
-speakEnglish(Clock ${status.toLowerCase()} successful. Have a good day.);
-setTimeout(() => { location.reload(); }, 1500);
-})
-.catch(err => {
-alert("Network packet error: " + err);
-speakEnglish("Transmission error.");
-});
-}
+        if (!nama) { alert("Please select your name!"); return; }
+        if (!siteFinal) { alert("Please select or type your work location!"); return; }
+        if (lokasiKoordinat === "Belum Terdeteksi") { alert("Waiting for GPS lock..."); return; }
 
+        textGps.innerText = "⏳ Uploading parameters to cloud storage...";
+        textGps.style.color = "#e67e22";
+        speakEnglish("Uploading attendance data.");
 
+        const canvas = document.createElement('canvas');
+        canvas.width = webcam.videoWidth;
+        canvas.height = webcam.videoHeight;
+        canvas.getContext('2d').drawImage(webcam, 0, 0);
+        const dataFotoBase64 = canvas.toDataURL('image/jpeg');
 
+        let param = new URLSearchParams();
+        param.append("action", "attendance");
+        param.append("nama", nama);
+        param.append("status", status);
+        param.append("sitework", siteFinal);
+        param.append("gps", lokasiKoordinat);
+        param.append("foto", dataFotoBase64);
+
+        // Menggunakan mode no-cors agar lolos 100% dari proteksi HP
+        fetch(urlEngine, { method: 'POST', mode: 'no-cors', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
+        .then(() => {
+            alert(`Attendance submitted successfully for site: ${siteFinal}`);
+            speakEnglish(`Clock ${status.toLowerCase()} successful. Have a good day.`);
+            document.getElementById('karyawanNama').value = "";
+            document.getElementById('siteDropdown').value = "";
+            document.getElementById('manualSiteGroup').style.display = 'none';
+            textGps.innerText = "✅ GPS Location Locked Successfully";
+            textGps.style.color = "#27ae60";
+        })
+        .catch(err => {
+            alert("Network error: " + err);
+            speakEnglish("Transmission error.");
+        });
+    }
+</script>
+</body>
+</html>
