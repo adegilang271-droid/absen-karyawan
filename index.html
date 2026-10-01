@@ -22,44 +22,54 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         .status-gps { font-size: 13px; font-weight: 600; margin-bottom: 15px; color: #e67e22; }
         .btn-submit { background: linear-gradient(to right, #11998e, #38ef7d); color: white; border: none; padding: 16px; font-size: 16px; font-weight: 600; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(17,153,142,0.3); transition: 0.3s; }
-        #statusLoading { font-size: 14px; color: #11998e; font-weight: 600; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 <div class="app-card">
     <div class="logo-title">🏢 ABSENSI ONLINE</div>
     <div class="sub-title">Enterprise Attendance Management</div>
-    <div id="statusLoading">⏳ Fetching Employee List from Cloud...</div>
-    <div id="mainForm" style="display: none;">
-        <div class="input-group">
-            <label>Select Your Name</label>
-            <select id="karyawanNama">
-                <option value="">-- Choose Registered Identity --</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>Select Attendance Status</label>
-            <div class="radio-group">
-                <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
-                <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
-                <input type="radio" id="pulang" name="status_absen" value="PULANG">
-                <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
-            </div>
-        </div>
-        <div class="input-group">
-            <label>Site Work / Location</label>
-            <input type="text" id="siteWorkInput" placeholder="Ketik nama lokasi proyek tempat bertugas..." required>
-        </div>
-        <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
-        <div class="camera-box">
-            <video id="webcam" autoplay playsinline></video>
-        </div>
-        <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
-        <button class="btn-submit" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
+    <div class="input-group">
+        <label>Select Your Name</label>
+        <select id="karyawanNama">
+            <option value="">-- Choose Your Name --</option>
+            <option value="Ade Gilang">Ade Gilang</option>
+            <option value="Gilang">Gilang</option>
+            <option value="Diman">Diman</option>
+            <option value="Eko">Eko</option>
+            <option value="Dery">Dery</option>
+            <option value="Milon">Milon</option>
+            <option value="Zainudin">Zainudin</option>
+            <option value="Wawan">Wawan</option>
+            <option value="Sakib">Sakib</option>
+            <option value="Maju">Maju</option>
+            <option value="Kamal">Kamal</option>
+            <option value="Hasan">Hasan</option>
+            <option value="Rahman">Rahman</option>
+            <option value="Kodir">Kodir</option>
+        </select>
     </div>
+    <div class="input-group">
+        <label>Select Attendance Status</label>
+        <div class="radio-group">
+            <input type="radio" id="masuk" name="status_absen" value="MASUK" checked>
+            <label for="masuk" class="radio-label">☀️ CLOCK IN</label>
+            <input type="radio" id="pulang" name="status_absen" value="PULANG">
+            <label for="pulang" class="radio-label">🌙 CLOCK OUT</label>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>Site Work / Location</label>
+        <input type="text" id="siteWorkInput" placeholder="Ketik nama lokasi proyek tempat bertugas..." required>
+    </div>
+    <label style="text-align: left; display: block;">Preview Kamera Selfie</label>
+    <div class="camera-box">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+    <div id="textGps" class="status-gps">📍 Synchronizing GPS Location...</div>
+    <button class="btn-submit" onclick="submitAttendanceData()">SUBMIT ATTENDANCE</button>
 </div>
 <script>
-    const urlEngine = "${MY_NEW_URL}";
+    const urlEngine = "${https://script.google.com/macros/s/AKfycby0Vltbk3CIpzcGQIw3-TopfTo2GjyowyH_motgyg7pDDwbc6Z2OcR0mfmswDGUdoeMsQ/exec}";
     let lokasiKoordinat = "Belum Terdeteksi";
     const webcam = document.getElementById('webcam');
     const textGps = document.getElementById('textGps');
@@ -71,41 +81,20 @@
             window.speechSynthesis.speak(speech);
         }
     }
-    window.addEventListener('DOMContentLoaded', () => {
-        fetch(urlEngine)
-        .then(res => res.json())
-        .then(listNama => {
-            const dropdown = document.getElementById('karyawanNama');
-            listNama.forEach(nama => {
-                let opt = document.createElement('option');
-                opt.value = nama;
-                opt.innerHTML = nama;
-                dropdown.appendChild(opt);
-            });
-            document.getElementById('statusLoading').style.display = 'none';
-            document.getElementById('mainForm').style.display = 'block';
-            initiateHardware();
-        })
-        .catch(err => {
-            document.getElementById('statusLoading').innerText = "❌ Cloud synchronization failed: " + err;
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => { webcam.srcObject = stream; })
+        .catch(err => alert("Camera permission error: " + err));
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+            textGps.innerText = "✅ GPS Location Locked Successfully";
+            textGps.style.color = "#27ae60";
+            speakEnglish("G.P.S locked.");
+        }, () => {
+            textGps.innerText = "❌ Please enable GPS!";
+            textGps.style.color = "#c0392b";
+            speakEnglish("Please turn on your location.");
         });
-    });
-    function initiateHardware() {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(stream => { webcam.srcObject = stream; })
-            .catch(err => alert("Camera permission error: " + err));
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                lokasiKoordinat = `${pos.coords.latitude}, ${pos.coords.longitude}`;
-                textGps.innerText = "✅ GPS Location Locked Successfully";
-                textGps.style.color = "#27ae60";
-                speakEnglish("G.P.S locked.");
-            }, () => {
-                textGps.innerText = "❌ Please enable GPS!";
-                textGps.style.color = "#c0392b";
-                speakEnglish("Please turn on your location.");
-            });
-        }
     }
     function submitAttendanceData() {
         const nama = document.getElementById('karyawanNama').value;
@@ -128,17 +117,16 @@
         param.append("sitework", siteFinal);
         param.append("gps", lokasiKoordinat);
         param.append("foto", dataFotoBase64);
-        fetch(urlEngine, { method: 'POST', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
-        .then(res => res.json())
-        .then(resObj => {
-            alert(`Attendance submitted successfully for site: ${siteFinal}`);
+        fetch(urlEngine, { method: 'POST', mode: 'no-cors', body: param, headers: { 'Content-Type': 'x-www-form-urlencoded' } })
+        .then(() => {
+            alert(`Attendance submitted successfully for: ${nama}`);
             speakEnglish(`Clock ${status.toLowerCase()} successful. Have a good day.`);
-            location.reload();
+            document.getElementById('siteWorkInput').value = "";
         })
-        .catch(err => {
-            alert(`Attendance submitted successfully for site: ${siteFinal}`);
+        .catch(() => {
+            alert(`Attendance submitted successfully for: ${nama}`);
             speakEnglish(`Clock ${status.toLowerCase()} successful. Have a good day.`);
-            location.reload();
+            document.getElementById('siteWorkInput').value = "";
         });
     }
 </script>
